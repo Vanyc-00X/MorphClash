@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>MorphClash — Игра, которая меняет правила</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stage">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen" id="screen">
+
+        <!-- MENU -->
+        <section class="page active" id="page-menu">
+          <div class="menu-hero">
+            <p class="brand">MORPHCLASH</p>
+            <h1>Правила<br />ломаются</h1>
+            <p class="sub">24 режима: шахматы, шашки, морской бой, реверси, сапёр, змейка и ещё куча. Лидер тащит бонус в новый стиль.</p>
+          </div>
+          <div class="mode-preview" id="modePreview"></div>
+          <label class="interval">
+            <span>Смена каждые</span>
+            <select id="intervalSelect">
+              <option value="15">15 сек</option>
+              <option value="20" selected>20 сек</option>
+              <option value="30">30 сек</option>
+              <option value="random">рандом 12–28</option>
+            </select>
+          </label>
+          <button class="btn big" id="startBtn">Vs ИИ</button>
+          <button class="btn big online" id="onlineBtn">Онлайн с другом</button>
+          <p class="hint">Очки переносятся между режимами · онлайн через код комнаты</p>
+        </section>
+
+        <!-- ONLINE LOBBY -->
+        <section class="page" id="page-online">
+          <p class="brand">ONLINE</p>
+          <h1 class="online-title">Дуэль по коду</h1>
+          <p class="sub">P2P через PeerJS. Один создаёт комнату, второй вводит код. Нужен интернет.</p>
+          <div class="online-actions">
+            <button class="btn big" id="createRoomBtn">Создать комнату</button>
+            <div class="room-code-box" id="roomCodeBox" hidden>
+              <span>Код комнаты</span>
+              <strong id="roomCodeOut">—————</strong>
+              <button class="btn ghost" id="copyRoomBtn" type="button">Копировать</button>
+            </div>
+            <div class="join-row">
+              <input id="roomCodeIn" maxlength="8" placeholder="Код друга" autocomplete="off" />
+              <button class="btn big" id="joinRoomBtn" type="button">Войти</button>
+            </div>
+            <button class="btn big" id="onlineStartBtn" disabled>Старт матча</button>
+            <p class="online-status" id="onlineStatus">Создай комнату или войди по коду</p>
+            <button class="btn ghost" id="onlineBackBtn" type="button">Назад</button>
+          </div>
+          <p class="hint">Онлайн-плейлист: 12 дуэльных режимов с морфом и переносом преимущества</p>
+        </section>
+
+        <!-- GAME -->
+        <section class="page" id="page-game">
+          <header class="hud">
+            <div class="score you">
+              <span>Ты</span>
+              <strong id="scoreYou">0</strong>
+            </div>
+            <div class="morph-timer">
+              <div class="morph-ring">
+                <svg viewBox="0 0 56 56">
+                  <circle cx="28" cy="28" r="24" class="bg" />
+                  <circle cx="28" cy="28" r="24" class="fg" id="morphArc" />
+                </svg>
+                <em id="morphSec">20</em>
+              </div>
+              <small id="modeLabel">Шахматы</small>
+            </div>
+            <div class="score ai">
+              <span id="oppLabel">ИИ</span>
+              <strong id="scoreAi">0</strong>
+            </div>
+          </header>
+
+          <div class="advantage" id="advantageBar">
+            <div class="adv-fill you" id="advYou"></div>
+            <div class="adv-fill ai" id="advAi"></div>
+            <span id="advText">равная партия</span>
+          </div>
+
+          <div class="board-wrap">
+            <div class="board-head">
+              <span class="pill" id="turnPill">Твой ход</span>
+              <span class="pill ghost" id="bonusPill" hidden></span>
+            </div>
+            <div id="board" class="board"></div>
+            <p class="help" id="helpText"></p>
+          </div>
+
+          <div class="game-actions">
+            <button class="btn ghost" id="morphNow">Сменить сейчас</button>
+            <button class="btn ghost" id="quitBtn">Меню</button>
+          </div>
+        </section>
+
+        <!-- RESULT -->
+        <section class="page" id="page-result">
+          <p class="brand">MORPHCLASH</p>
+          <h2 id="resultTitle">Победа</h2>
+          <p id="resultSub">Ты удержал преимущество через все режимы</p>
+          <div class="result-scores">
+            <div><span>Ты</span><strong id="finalYou">0</strong></div>
+            <div><span>ИИ</span><strong id="finalAi">0</strong></div>
+          </div>
+          <div class="history" id="history"></div>
+          <button class="btn big" id="againBtn">Ещё раунд</button>
+        </section>
+
+        <!-- MORPH OVERLAY -->
+        <div class="morph-overlay" id="morphOverlay" hidden>
+          <div class="morph-card">
+            <p>СМЕНА РЕЖИМА</p>
+            <h2 id="morphName">Морской бой</h2>
+            <p class="morph-bonus" id="morphBonus"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="pitch">
+      <p class="brand">MORPHCLASH</p>
+      <h2>Мобильная игра со сменой стиля</h2>
+      <p>Каждые N секунд поле превращается между 24 стилями. Лидер входит в новый режим с бонусом.</p>
+    </aside>
+  </div>
+  <script src="modes-extra.js"></script>
+  <script src="online.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
